@@ -1,6 +1,4 @@
 'use strict';
-// TODO: this dance is probably wrong as it shouldn't work with table/tr/td
-
 const {render} = require('uland');
 
 const {defineProperty, freeze, slice} = require('./common.js');

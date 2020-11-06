@@ -1,5 +1,3 @@
-// TODO: this dance is probably wrong as it shouldn't work with table/tr/td
-
 import {render} from 'uland';
 
 import {defineProperty, freeze, slice} from './common.js';

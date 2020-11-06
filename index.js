@@ -1508,8 +1508,6 @@ self.kaboobie = (function (exports) {
   var ignore = [];
   var slice$1 = ignore.slice;
 
-  // TODO: this dance is probably wrong as it shouldn't work with table/tr/td
-
   var replace = function replace(child) {
     var parentNode = child.parentNode;
 
