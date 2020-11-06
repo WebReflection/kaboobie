@@ -3,13 +3,12 @@
 
 const {render} = require('uland');
 
-const {defineProperty} = Object;
-const {slice} = [];
+const {defineProperty, freeze, slice} = require('./common.js');
 
 const replace = child => {
   const {parentNode} = child;
   if (parentNode) {
-    const children = slice.call(child.children);
+    const children = freeze(slice.call(child.children));
     const fragment = document.createDocumentFragment();
     const {_} = child;
     delete child._;
@@ -36,7 +35,11 @@ const upgrade = element => {
 
 new MutationObserver(records => {
   for (let i = 0, {length} = records; i < length; i++) {
-    for (let {addedNodes} = records[i], j = 0, {length} = addedNodes; j < length; j++) {
+    for (let
+      {addedNodes} = records[i],
+      j = 0, {length} = addedNodes;
+      j < length; j++
+    ) {
       const element = addedNodes[j];
       if (element.querySelectorAll) {
         upgrade(element);

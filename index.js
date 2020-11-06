@@ -1503,9 +1503,12 @@ self.kaboobie = (function (exports) {
     };
   }
 
+  var defineProperty = Object.defineProperty,
+      freeze = Object.freeze;
+  var ignore = [];
+  var slice$1 = ignore.slice;
+
   // TODO: this dance is probably wrong as it shouldn't work with table/tr/td
-  var defineProperty = Object.defineProperty;
-  var slice$1 = [].slice;
 
   var replace = function replace(child) {
     var parentNode = child.parentNode;
@@ -1516,7 +1519,7 @@ self.kaboobie = (function (exports) {
         render$1(fragment, this.$(_));
       };
 
-      var children = slice$1.call(child.children);
+      var children = freeze(slice$1.call(child.children));
       var fragment = document.createDocumentFragment();
       var _ = child._;
       delete child._;
@@ -1554,7 +1557,6 @@ self.kaboobie = (function (exports) {
   // TODO: regular attributes should be passed as props too
   var components = new WeakMap();
   var remapped = new WeakMap();
-  var ignore = [];
   var attr$1 = /(\w+)=/g;
   var close = /<\/{1,2}>/g;
 
@@ -1580,7 +1582,7 @@ self.kaboobie = (function (exports) {
     var T = [template[0]];
     var V = [];
 
-    for (var j = 0, i = 1, _length = template.length; i < _length; i++) {
+    for (var j = 0, i = 1, _template = template, _length = _template.length; i < _length; i++) {
       var value = values[i - 1];
 
       if (typeof value === 'function' && components.has(value) && /<$/.test(T[j])) {
@@ -1623,10 +1625,11 @@ self.kaboobie = (function (exports) {
         }
       }
 
-      return [T].concat(mapped);
+      return [template].concat(mapped);
     };
 
     remapped.set(template, update);
+    template = freeze(T);
     return update;
   };
 

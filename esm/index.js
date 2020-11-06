@@ -3,6 +3,8 @@
 
 import './observer.js';
 
+import {freeze, ignore} from './common.js';
+
 import {
   render, html as uhtml, svg as usvg, Component as UComponent,
   contextual,
@@ -18,7 +20,6 @@ import {
 
 const components = new WeakMap;
 const remapped = new WeakMap;
-const ignore = [];
 
 const attr = /(\w+)=/g;
 const close = /<\/{1,2}>/g;
@@ -80,9 +81,10 @@ const remap = (template, values) => {
         mapped.push(component, props);
       }
     }
-    return [T].concat(mapped);
+    return [template].concat(mapped);
   };
   remapped.set(template, update);
+  template = freeze(T);
   return update;
 };
 

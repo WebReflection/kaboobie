@@ -4,13 +4,14 @@
 
 require('./observer.js');
 
+const {freeze, ignore} = require('./common.js');
+
 const {
   render, html: uhtml, svg: usvg, Component: UComponent, contextual, useState, useEffect, useContext, createContext, useRef, useReducer, useCallback, useMemo, useLayoutEffect
 } = require('uland');
 
 const components = new WeakMap;
 const remapped = new WeakMap;
-const ignore = [];
 
 const attr = /(\w+)=/g;
 const close = /<\/{1,2}>/g;
@@ -72,9 +73,10 @@ const remap = (template, values) => {
         mapped.push(component, props);
       }
     }
-    return [T].concat(mapped);
+    return [template].concat(mapped);
   };
   remapped.set(template, update);
+  template = freeze(T);
   return update;
 };
 
