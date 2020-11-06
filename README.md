@@ -31,3 +31,5 @@ render(document.body, html`
 ```
 
 **[Live Demo](https://webreflection.github.io/kaboobie/test/)**
+
+For other examples, check the [test folder](./test) published live too.
