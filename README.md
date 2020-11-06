@@ -95,6 +95,27 @@ html`
 `;
 ```
 
+Meaning, the tag will receive instead:
+
+```js
+html(
+  [
+    "<kaboobie style=\"display:none\" .$=", " ._=",
+    ">\n    <kaboobie style=\"display:none\" .$=", " ._=",
+    " />\n    <kaboobie style=\"display:none\" .$=", " ._=",
+    "> Hello </kaboobie>\n  </kaboobie>"
+  ],
+  Component,
+  {test: {data: 123}, value: 456},
+  A,
+  {any: 'thing'},
+  B,
+  {}
+)
+```
+
+And render it accordingly with *uhtml* direct properties `.name=${value}` feature.
+
 The *MutationObserver* at this point looks only for `<kaboobie>` nodes, and replaces these with a *µland* component through the `render(...)` utility.
 
 ```js
