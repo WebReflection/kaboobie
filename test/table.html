@@ -19,6 +19,7 @@
       `;
     });
     const Tr = Component(({children}) => {
+      console.log(children);
       return html`
         <tr>
           ${children}
@@ -41,6 +42,7 @@
         <${Tr}>
           <${Td} value=${'second'} />
           <${Td} value=${'row'} />
+          <!-- td>row</td -->
         </>
       </>
     `);

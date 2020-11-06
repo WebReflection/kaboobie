@@ -1552,17 +1552,25 @@ self.kaboobie = (function (exports) {
     subtree: true
   });
 
-  // TODO: regular attributes should be passed as props too
+  // TODO: should ...${props} work as well?
   var components = new WeakMap();
   var remapped = new WeakMap();
-  var attr$1 = /(\w+)=/g;
+  var attr$1 = /(\w+)(=[^\s]*|\s|$)/g;
   var close = /<\/{1,2}>/g;
 
   var addKeys = function addKeys(keys, chunk) {
     var match;
 
     while (match = attr$1.exec(chunk)) {
-      keys.push(match[1]);
+      var k = match[1];
+      var v = match[2];
+      var _v = v,
+          length = _v.length;
+      if (length && v[0] === '=') v = 1 < length ? v.slice(1).replace(/('|")([^\1]*?)\1[\s\S]*$/, '$2') : ignore;else v = '';
+      keys.push({
+        k: k,
+        v: v
+      });
     }
   };
 
@@ -1609,7 +1617,7 @@ self.kaboobie = (function (exports) {
           addKeys(keys, template[i++]);
         }
 
-        addKeys(keys, template[i].slice(0, i));
+        addKeys(keys, template[i].slice(0, index));
         var rest = template[i].slice(index);
         if (0 < index && template[i][index - 1] === '/') rest = ' /' + rest;
         T[j] = rest.replace(close, '</kaboobie>');
@@ -1631,8 +1639,11 @@ self.kaboobie = (function (exports) {
           var component = values[_j++];
           var props = {};
 
-          for (var k = 0, _length2 = _keys.length; k < _length2; k++) {
-            props[_keys[k]] = values[_j++];
+          for (var l = 0, _length2 = _keys.length; l < _length2; l++) {
+            var _keys$l = _keys[l],
+                k = _keys$l.k,
+                v = _keys$l.v;
+            props[k] = v === ignore ? values[_j++] : v;
           }
 
           mapped.push(component, props);

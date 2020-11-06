@@ -1,5 +1,4 @@
 'use strict';
-// TODO: regular attributes should be passed as props too
 // TODO: should ...${props} work as well?
 
 require('./observer.js');
@@ -13,13 +12,21 @@ const {
 const components = new WeakMap;
 const remapped = new WeakMap;
 
-const attr = /(\w+)=/g;
+const attr = /(\w+)(=[^\s]*|\s|$)/g;
 const close = /<\/{1,2}>/g;
 
 const addKeys = (keys, chunk) => {
   let match;
-  while (match = attr.exec(chunk))
-    keys.push(match[1]);
+  while (match = attr.exec(chunk)) {
+    const k = match[1];
+    let v = match[2];
+    const {length} = v;
+    if (length && v[0] === '=')
+      v = 1 < length ? v.slice(1).replace(/('|")([^\1]*?)\1[\s\S]*$/, '$2') : ignore;
+    else
+      v = '';
+    keys.push({k, v});
+  }
 };
 
 const apply = (tag, template, values) => tag.apply(
@@ -49,7 +56,7 @@ const remap = (template, values) => {
       let index = 0;
       while ((index = template[i].indexOf('>')) < 0)
         addKeys(keys, template[i++]);
-      addKeys(keys, template[i].slice(0, i));
+      addKeys(keys, template[i].slice(0, index));
       let rest = template[i].slice(index);
       if (0 < index && template[i][index - 1] === '/')
         rest = ' /' + rest;
@@ -71,8 +78,10 @@ const remap = (template, values) => {
       else {
         const component = values[j++];
         const props = {};
-        for (let k = 0, {length} = keys; k < length; k++)
-          props[keys[k]] = values[j++];
+        for (let l = 0, {length} = keys; l < length; l++) {
+          const {k, v} = keys[l];
+          props[k] = v === ignore ? values[j++] : v;
+        }
         mapped.push(component, props);
       }
     }
