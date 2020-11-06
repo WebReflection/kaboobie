@@ -1,4 +1,5 @@
 // TODO: regular attributes should be passed as props too
+// TODO: should ...${props} work as well?
 
 import './observer.js';
 
@@ -19,8 +20,10 @@ const components = new WeakMap;
 const remapped = new WeakMap;
 const ignore = [];
 
+const attr = /(\w+)=/g;
+const close = /<\/{1,2}>/g;
+
 const addKeys = (keys, chunk) => {
-  const attr = /(\w+)=/g;
   let match;
   while (match = attr.exec(chunk))
     keys.push(match[1]);
@@ -54,11 +57,11 @@ const remap = (template, values) => {
       let rest = template[i].slice(index);
       if (0 < index && template[i][index - 1] === '/')
         rest = ' /' + rest;
-      T[j] = rest.replace(/<\/>/g, '</kaboobie>');
+      T[j] = rest.replace(close, '</kaboobie>');
       V.push(keys);
     }
     else {
-      T[++j] = template[i].replace(/<\/>/g, '</kaboobie>');
+      T[++j] = template[i].replace(close, '</kaboobie>');
       V.push(ignore);
     }
   }
@@ -70,11 +73,11 @@ const remap = (template, values) => {
       if (keys === ignore)
         mapped.push(values[j++]);
       else {
-        const uid = values[j++];
+        const component = values[j++];
         const props = {};
         for (let k = 0, {length} = keys; k < length; k++)
           props[keys[k]] = values[j++];
-        mapped.push(uid, props);
+        mapped.push(component, props);
       }
     }
     return [T].concat(mapped);
@@ -100,7 +103,7 @@ export {
 };
 
 function Component(fn) {
-  const component = UComponent(fn);
-  components.set(component, true);
-  return component;
+  const Kaboobie = UComponent(fn);
+  components.set(Kaboobie, true);
+  return Kaboobie;
 }

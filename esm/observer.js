@@ -2,20 +2,31 @@
 
 import {render} from 'uland';
 
+const {defineProperty} = Object;
+const {slice} = [];
+
 const replace = child => {
   const {parentNode} = child;
   if (parentNode) {
-    const {$, _} = child;
-    // TODO: children is weird to solve here ...
-    // _.children = ignore.slice.call(child.children);
+    const children = slice.call(child.children);
     const fragment = document.createDocumentFragment();
-    render(fragment, $(_));
+    const {_} = child;
+    delete child._;
+    set.call(defineProperty(child, '_', {set}), _);
     parentNode.replaceChild(fragment, child);
+    function set(_) {
+      _.children = children;
+      render(fragment, this.$(_));
+    }
   }
 };
 
 const upgrade = element => {
-  for (let children = element.querySelectorAll('kaboobie'), i = 0, {length} = children; i < length; i++) {
+  for (let
+    children = element.querySelectorAll('kaboobie'),
+    i = 0, {length} = children;
+    i < length; i++
+  ) {
     const child = children[i];
     upgrade(child);
     replace(child);

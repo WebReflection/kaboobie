@@ -1,43 +1,6 @@
 self.kaboobie = (function (exports) {
   'use strict';
 
-  // TODO: this dance is probably wrong as it shouldn't work with table/tr/td
-  var replace = function replace(child) {
-    var parentNode = child.parentNode;
-
-    if (parentNode) {
-      var $ = child.$,
-          _ = child._; // TODO: children is weird to solve here ...
-      // _.children = ignore.slice.call(child.children);
-
-      parentNode.replaceChild($(_).valueOf(), child);
-    }
-  };
-
-  var upgrade = function upgrade(element) {
-    for (var children = element.querySelectorAll('kaboobie'), i = 0, length = children.length; i < length; i++) {
-      var child = children[i];
-      upgrade(child);
-      replace(child);
-    }
-  };
-
-  new MutationObserver(function (records) {
-    for (var i = 0, length = records.length; i < length; i++) {
-      for (var addedNodes = records[i].addedNodes, j = 0, _length = addedNodes[j].length; j < _length; j++) {
-        var element = addedNodes[j];
-
-        if (element.querySelectorAll) {
-          upgrade(element);
-          if (/^kaboobie$/i.test(element.tagName)) replace(element);
-        }
-      }
-    }
-  }).observe(document, {
-    childList: true,
-    subtree: true
-  });
-
   function _typeof(obj) {
     "@babel/helpers - typeof";
 
@@ -1540,16 +1503,65 @@ self.kaboobie = (function (exports) {
     };
   }
 
+  // TODO: this dance is probably wrong as it shouldn't work with table/tr/td
+  var defineProperty = Object.defineProperty;
+  var slice$1 = [].slice;
+
+  var replace = function replace(child) {
+    var parentNode = child.parentNode;
+
+    if (parentNode) {
+      var set = function set(_) {
+        _.children = children;
+        render$1(fragment, this.$(_));
+      };
+
+      var children = slice$1.call(child.children);
+      var fragment = document.createDocumentFragment();
+      var _ = child._;
+      delete child._;
+      set.call(defineProperty(child, '_', {
+        set: set
+      }), _);
+      parentNode.replaceChild(fragment, child);
+    }
+  };
+
+  var upgrade = function upgrade(element) {
+    for (var children = element.querySelectorAll('kaboobie'), i = 0, length = children.length; i < length; i++) {
+      var child = children[i];
+      upgrade(child);
+      replace(child);
+    }
+  };
+
+  new MutationObserver(function (records) {
+    for (var i = 0, length = records.length; i < length; i++) {
+      for (var addedNodes = records[i].addedNodes, j = 0, _length = addedNodes.length; j < _length; j++) {
+        var element = addedNodes[j];
+
+        if (element.querySelectorAll) {
+          upgrade(element);
+          if (/^kaboobie$/i.test(element.tagName)) replace(element);
+        }
+      }
+    }
+  }).observe(document, {
+    childList: true,
+    subtree: true
+  });
+
   // TODO: regular attributes should be passed as props too
   var components = new WeakMap();
   var remapped = new WeakMap();
   var ignore = [];
+  var attr$1 = /(\w+)=/g;
+  var close = /<\/{1,2}>/g;
 
   var addKeys = function addKeys(keys, chunk) {
-    var attr = /(\w+)=/g;
     var match;
 
-    while (match = attr.exec(chunk)) {
+    while (match = attr$1.exec(chunk)) {
       keys.push(match[1]);
     }
   };
@@ -1584,10 +1596,10 @@ self.kaboobie = (function (exports) {
         addKeys(keys, template[i].slice(0, i));
         var rest = template[i].slice(index);
         if (0 < index && template[i][index - 1] === '/') rest = ' /' + rest;
-        T[j] = rest.replace(/<\/>/g, '</kaboobie>');
+        T[j] = rest.replace(close, '</kaboobie>');
         V.push(keys);
       } else {
-        T[++j] = template[i].replace(/<\/>/g, '</kaboobie>');
+        T[++j] = template[i].replace(close, '</kaboobie>');
         V.push(ignore);
       }
     }
@@ -1600,14 +1612,14 @@ self.kaboobie = (function (exports) {
       for (var _j = 0, _i = 0; _i < length; _i++) {
         var _keys = V[_i];
         if (_keys === ignore) mapped.push(values[_j++]);else {
-          var uid = values[_j++];
+          var component = values[_j++];
           var props = {};
 
           for (var k = 0, _length2 = _keys.length; k < _length2; k++) {
             props[_keys[k]] = values[_j++];
           }
 
-          mapped.push(uid, props);
+          mapped.push(component, props);
         }
       }
 
@@ -1622,9 +1634,9 @@ self.kaboobie = (function (exports) {
   var svg$2 = create$2(svg$1);
 
   function Component$1(fn) {
-    var component = Component(fn);
-    components.set(component, true);
-    return component;
+    var Kaboobie = Component(fn);
+    components.set(Kaboobie, true);
+    return Kaboobie;
   }
 
   exports.Component = Component$1;
