@@ -22,13 +22,16 @@ const addKeys = (keys, chunk) => {
     keys.push(match[1]);
 };
 
-const create = tag => (template, ...values) => tag.apply(
+const apply = (tag, template, values) => tag.apply(
   null,
-  (
-    remapped.get(template) ||
-    remap(template, values)
-  )(values)
+  (remapped.get(template) || remap(template, values))(values)
 );
+
+const create = tag => {
+  const kaboobie = (t, ...v) => apply(tag, t, v);
+  kaboobie.for = (ref, id) => (t, ...v) => apply(tag.for(ref, id), t, v);
+  return kaboobie;
+};
 
 const remap = (template, values) => {
   const T = [template[0]];

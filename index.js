@@ -1568,14 +1568,30 @@ self.kaboobie = (function (exports) {
     }
   };
 
+  var apply = function apply(tag, template, values) {
+    return tag.apply(null, (remapped.get(template) || remap(template, values))(values));
+  };
+
   var create$2 = function create(tag) {
-    return function (template) {
-      for (var _len = arguments.length, values = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        values[_key - 1] = arguments[_key];
+    var kaboobie = function kaboobie(t) {
+      for (var _len = arguments.length, v = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        v[_key - 1] = arguments[_key];
       }
 
-      return tag.apply(null, (remapped.get(template) || remap(template, values))(values));
+      return apply(tag, t, v);
     };
+
+    kaboobie["for"] = function (ref, id) {
+      return function (t) {
+        for (var _len2 = arguments.length, v = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          v[_key2 - 1] = arguments[_key2];
+        }
+
+        return apply(tag["for"](ref, id), t, v);
+      };
+    };
+
+    return kaboobie;
   };
 
   var remap = function remap(template, values) {
