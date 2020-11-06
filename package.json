@@ -1,6 +1,6 @@
 {
   "name": "kaboobie",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A µland based experiment",
   "main": "./cjs/index.js",
   "scripts": {
