@@ -13,10 +13,13 @@
   .then(({Component, render, html, useState}) => {
 
     // each component receives its "props"
-    const Counter = Component(({start}) => {
+    const Counter = Component(({start, disabled, test}) => {
       const [count, setCount] = useState(start);
       return html`
-      <button onclick=${() => setCount(count + 1)}>
+      <button
+        .disabled=${disabled}
+        test=${test}
+        onclick=${() => setCount(count + 1)}>
         Count: ${count}
       </button>`;
     });

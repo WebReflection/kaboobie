@@ -21,6 +21,7 @@ const components = new WeakMap;
 const remapped = new WeakMap;
 
 const attr = /(\w+)(=[^\s]*|\s|$)/g;
+const outer = /('|")([^\1]*?)\1[\s\S]*$/;
 const close = /<\/{1,2}>/g;
 
 const addKeys = (keys, chunk) => {
@@ -30,9 +31,9 @@ const addKeys = (keys, chunk) => {
     let v = match[2];
     const {length} = v;
     if (length && v[0] === '=')
-      v = 1 < length ? v.slice(1).replace(/('|")([^\1]*?)\1[\s\S]*$/, '$2') : ignore;
+      v = 1 < length ? v.slice(1).replace(outer, '$2') : ignore;
     else
-      v = '';
+      v = true;
     keys.push({k, v});
   }
 };

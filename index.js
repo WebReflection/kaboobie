@@ -1556,6 +1556,7 @@ self.kaboobie = (function (exports) {
   var components = new WeakMap();
   var remapped = new WeakMap();
   var attr$1 = /(\w+)(=[^\s]*|\s|$)/g;
+  var outer = /('|")([^\1]*?)\1[\s\S]*$/;
   var close = /<\/{1,2}>/g;
 
   var addKeys = function addKeys(keys, chunk) {
@@ -1566,7 +1567,7 @@ self.kaboobie = (function (exports) {
       var v = match[2];
       var _v = v,
           length = _v.length;
-      if (length && v[0] === '=') v = 1 < length ? v.slice(1).replace(/('|")([^\1]*?)\1[\s\S]*$/, '$2') : ignore;else v = '';
+      if (length && v[0] === '=') v = 1 < length ? v.slice(1).replace(outer, '$2') : ignore;else v = true;
       keys.push({
         k: k,
         v: v
