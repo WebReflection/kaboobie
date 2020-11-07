@@ -178,3 +178,52 @@ As I'll likely keep playing around with this idea, more examples will come, but 
 
   </div>
 </details>
+
+<details>
+  <summary><strong>Any caveat?</strong></summary>
+  <div>
+
+Elements that cannot be represented standalone within an unknown element, such as `<tr>`, `<td>`, or an `<option>` can't be part of the static layout.
+
+Example:
+
+```js
+const Table = Component(({children}) => {
+  return html`
+    <table>
+      ${children}
+    </table>
+  `;
+});
+const Tr = Component(({children}) => {
+  return html`
+    <tr>
+      ${children}
+    </tr>
+  `;
+});
+const Td = Component(({value}) => {
+  return html`
+    <td>
+      ${value}
+    </td>
+  `;
+});
+render(document.body, html`
+  <${Table}>
+    <${Tr}>
+      <${Td} value=${'This will be visible'} />
+    </>
+    <tr>
+      <td>Parent TR will be swalloed</td>
+    </tr>
+  </>
+`);
+```
+
+The reason is that there's no way to place some specific element outside their expected container, and a `<template>` tag within a `<template>` tag might produce undesired results.
+
+That's it, remember that special elements are either fully static, statc withn their own definition, or simply use their components without mixing up components with native elements, and everything should be fine.
+
+  </div>
+</details>

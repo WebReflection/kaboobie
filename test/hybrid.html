@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>kaboobie</title>
+  <script type="module">
+  import(
+    /^(?:localhost|[::1]|127(?:.d+){3})$/.test(location.hostname) ?
+    '../esm/index.js' :
+    'https://unpkg.com/kaboobie@latest?module'
+  )
+  .then(({Component, render, html, useState}) => {
+    const Table = Component(({children}) => {
+      return html`
+        <table>
+          ${children}
+        </table>
+      `;
+    });
+    const Tr = Component(({children}) => {
+      return html`
+        <tr>
+          ${children}
+        </tr>
+      `;
+    });
+    const Td = Component(({value}) => {
+      return html`
+        <td>
+          ${value}
+        </td>
+      `;
+    });
+    render(document.body, html`
+      <${Table}>
+        <${Tr}>
+          <${Td} value=${'This will be visible'} />
+        </>
+        <tr>
+          <td>Parent TR will be swalloed</td>
+        </tr>
+      </>
+    `);
+  });
+  </script>
+</head>
+</html>
