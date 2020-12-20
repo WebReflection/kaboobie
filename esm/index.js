@@ -6,7 +6,6 @@ import {freeze, ignore} from './common.js';
 
 import {
   render, html as uhtml, svg as usvg, Component as UComponent,
-  contextual,
   useState,
   useEffect,
   useContext, createContext,
@@ -106,7 +105,6 @@ const svg = create(usvg);
 
 export {
   Component, render, html, svg,
-  contextual,
   useState,
   useEffect,
   useContext, createContext,

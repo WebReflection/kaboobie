@@ -6,7 +6,7 @@ require('./observer.js');
 const {freeze, ignore} = require('./common.js');
 
 const {
-  render, html: uhtml, svg: usvg, Component: UComponent, contextual, useState, useEffect, useContext, createContext, useRef, useReducer, useCallback, useMemo, useLayoutEffect
+  render, html: uhtml, svg: usvg, Component: UComponent, useState, useEffect, useContext, createContext, useRef, useReducer, useCallback, useMemo, useLayoutEffect
 } = require('uland');
 
 const components = new WeakMap;
@@ -100,7 +100,6 @@ exports.Component = Component;
 exports.render = render;
 exports.html = html;
 exports.svg = svg;
-exports.contextual = contextual;
 exports.useState = useState;
 exports.useEffect = useEffect;
 exports.useContext = useContext;
