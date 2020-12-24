@@ -196,7 +196,15 @@ self.kaboobie = (function (exports) {
   var runSchedule = function runSchedule() {
     var previous = schedule;
     schedule = new Set();
-    previous.forEach(update);
+    previous.forEach(function (_ref) {
+      var h = _ref.h,
+          c = _ref.c,
+          a = _ref.a,
+          e = _ref.e;
+      // avoid running schedules when the hook is
+      // re-executed before such schedule happens
+      if (e) h.apply(c, a);
+    });
   };
 
   var fx = new WeakMap();
@@ -257,15 +265,6 @@ self.kaboobie = (function (exports) {
       wait.then(runSchedule);
     }
   };
-  var update = function update(_ref) {
-    var h = _ref.h,
-        c = _ref.c,
-        a = _ref.a,
-        e = _ref.e;
-    // avoid running schedules when the hook is
-    // re-executed before such schedule happens
-    if (e) h.apply(c, a);
-  };
   var wait = new Lie(function ($) {
     return $();
   });
@@ -294,7 +293,12 @@ self.kaboobie = (function (exports) {
       this._ = new Set();
       this.value = newValue;
 
-      _.forEach(update);
+      _.forEach(function (_ref2) {
+        var h = _ref2.h,
+            c = _ref2.c,
+            a = _ref2.a;
+        h.apply(c, a);
+      });
     }
   }
 
@@ -321,19 +325,21 @@ self.kaboobie = (function (exports) {
           s = info.s,
           h = info.h;
       var call = i === s.length;
+      info.i++;
 
       if (call) {
         if (!fx.has(h)) fx.set(h, new Set());
-        s.push({
+        s[i] = {
           $: callback,
           _: guards,
           r: null,
           h: h
-        });
+        };
       }
 
-      var effect = s[info.i++];
-      if (call || !guards || guards.some(different, effect._)) stack.push(effect);
+      if (call || !guards || guards.some(different, s[i]._)) stack.push(s[i]);
+      s[i].$ = callback;
+      s[i]._ = guards;
     };
   };
 
@@ -472,6 +478,11 @@ self.kaboobie = (function (exports) {
     };
   });
 
+  var isArray = Array.isArray;
+  var _ref = [],
+      indexOf = _ref.indexOf,
+      slice = _ref.slice;
+
   var attr = /([^\s\\>"'=]+)\s*=\s*(['"]?)$/;
   var empty = /^(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)$/i;
   var node = /<[a-z][^>]+$/i;
@@ -506,11 +517,6 @@ self.kaboobie = (function (exports) {
     var output = text.join('').trim();
     return svg ? output : output.replace(selfClosing, regular);
   });
-
-  var isArray = Array.isArray;
-  var _ref = [],
-      indexOf = _ref.indexOf,
-      slice = _ref.slice;
 
   var ELEMENT_NODE = 1;
   var nodeType = 111;
@@ -1283,7 +1289,6 @@ self.kaboobie = (function (exports) {
   var html = tag('html');
   var svg = tag('svg');
 
-  var isArray$1 = Array.isArray;
   var create$1 = Object.create;
 
   var html$1 = function html(template) {
@@ -1365,7 +1370,7 @@ self.kaboobie = (function (exports) {
 
     for (var i = 0; i < length; i++) {
       var hook = values[i];
-      if (hook instanceof Hook) values[i] = unroll$1(s[i] || (s[i] = createCache$1()), hook);else if (hook instanceof Hole) unrollHole(s[i] || (s[i] = createCache$1()), hook);else if (isArray$1(hook)) unrollValues(s[i] || (s[i] = createCache$1()), hook, hook.length);else s[i] = null;
+      if (hook instanceof Hook) values[i] = unroll$1(s[i] || (s[i] = createCache$1()), hook);else if (hook instanceof Hole) unrollHole(s[i] || (s[i] = createCache$1()), hook);else if (isArray(hook)) unrollValues(s[i] || (s[i] = createCache$1()), hook, hook.length);else s[i] = null;
     }
 
     if (length < s.length) s.splice(length);
