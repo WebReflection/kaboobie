@@ -88,7 +88,7 @@ What *Kaboobie* does, is re-map once both template and values to become the foll
 ```js
 html`
   <kaboobie style="display:none"
-            .$=${Component} ._=${{test: {data: 123}, value: 456}}>
+            .$=${Component} ._=${({test: {data: 123}, value: 456})}>
     <kaboobie style="display:none" .$=${A} ._=${{any: 'thing'}} />
     <kaboobie style="display:none" .$=${B} ._=${{}}> Hello </kaboobie>
   </kaboobie>
