@@ -42,7 +42,7 @@
   },
   "unpkg": "min.js",
   "dependencies": {
-    "uland": "^0.6.0"
+    "uland": "^0.6.1"
   },
   "repository": {
     "type": "git",
