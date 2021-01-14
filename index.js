@@ -176,9 +176,8 @@ self.kaboobie = (function (exports) {
     }
   };
 
-  var h = null,
+  var info = null,
       schedule = new Set();
-  var hooks = new WeakMap();
 
   var invoke = function invoke(effect) {
     var $ = effect.$,
@@ -224,7 +223,7 @@ self.kaboobie = (function (exports) {
     });
   };
   var getInfo = function getInfo() {
-    return hooks.get(h);
+    return info;
   };
   var hasEffect = function hasEffect(hook) {
     return fx.has(hook);
@@ -233,7 +232,7 @@ self.kaboobie = (function (exports) {
     return typeof f === 'function';
   };
   var hooked = function hooked(callback) {
-    var info = {
+    var current = {
       h: hook,
       c: null,
       a: null,
@@ -241,18 +240,17 @@ self.kaboobie = (function (exports) {
       i: 0,
       s: []
     };
-    hooks.set(hook, info);
     return hook;
 
     function hook() {
-      var p = h;
-      h = hook;
-      info.e = info.i = 0;
+      var prev = info;
+      info = current;
+      current.e = current.i = 0;
 
       try {
-        return callback.apply(info.c = this, info.a = arguments);
+        return callback.apply(current.c = this, current.a = arguments);
       } finally {
-        h = p;
+        info = prev;
         if (effects.length) wait.then(effects.forEach.bind(effects.splice(0), invoke));
         if (layoutEffects.length) layoutEffects.splice(0).forEach(invoke);
       }
@@ -381,7 +379,7 @@ self.kaboobie = (function (exports) {
   };
 
   /*! (c) Andrea Giammarchi - ISC */
-  var h$1 = null,
+  var h = null,
       c = null,
       a = null;
   var fx$1 = new WeakMap();
@@ -412,10 +410,10 @@ self.kaboobie = (function (exports) {
     var hook = hooked(outer ?
     /*async*/
     function () {
-      var ph = h$1,
+      var ph = h,
           pc = c,
           pa = a;
-      h$1 = hook;
+      h = hook;
       c = this;
       a = arguments;
 
@@ -425,7 +423,7 @@ self.kaboobie = (function (exports) {
           callback.apply(c, a)
         );
       } finally {
-        h$1 = ph;
+        h = ph;
         c = pc;
         a = pa;
       }
@@ -433,10 +431,10 @@ self.kaboobie = (function (exports) {
     return hook;
   };
   var useReducer$1 = function useReducer$1(reducer, value, init) {
-    return wrap(h$1, c, a, useReducer(reducer, value, init));
+    return wrap(h, c, a, useReducer(reducer, value, init));
   };
   var useState$1 = function useState$1(value) {
-    return wrap(h$1, c, a, useState(value));
+    return wrap(h, c, a, useState(value));
   };
 
   /*! (c) Andrea Giammarchi - ISC */
@@ -827,8 +825,10 @@ self.kaboobie = (function (exports) {
       append(content, childNodes);
       return content;
     };
-    return function createContent(markup, type) {
-      return (type === 'svg' ? createSVG : createHTML)(markup);
+    return function createContent(markup, type, normalize) {
+      var content = (type === 'svg' ? createSVG : createHTML)(markup);
+      if (normalize) content.normalize();
+      return content;
     };
 
     function append(root, childNodes) {
@@ -885,8 +885,8 @@ self.kaboobie = (function (exports) {
   // later on, so that paths are retrieved from one already parsed,
   // hence without missing child nodes once re-cloned.
 
-  var createFragment = isImportNodeLengthWrong ? function (text, type) {
-    return importNode.call(document, createContent(text, type), true);
+  var createFragment = isImportNodeLengthWrong ? function (text, type, normalize) {
+    return importNode.call(document, createContent(text, type, normalize), true);
   } : createContent; // IE11 and old Edge have a different createTreeWalker signature that
   // has been deprecated in other browsers. This export is needed only
   // to guarantee the TreeWalker doesn't show warnings and, ultimately, works
@@ -1023,7 +1023,9 @@ self.kaboobie = (function (exports) {
   // content, within the exact same amount of updates each time.
   // This cache relates each template to its unique content and updates.
 
-  var cache = umap(new WeakMap());
+  var cache = umap(new WeakMap()); // a RegExp that helps checking nodes that cannot contain comments
+
+  var textOnly = /^(?:plaintext|script|style|textarea|title|xmp)$/i;
   var createCache = function createCache() {
     return {
       stack: [],
@@ -1063,7 +1065,7 @@ self.kaboobie = (function (exports) {
 
   var mapTemplate = function mapTemplate(type, template) {
     var text = instrument(template, prefix, type === 'svg');
-    var content = createFragment(text, type); // once instrumented and reproduced as fragment, it's crawled
+    var content = createFragment(text, type, true); // once instrumented and reproduced as fragment, it's crawled
     // to find out where each update is in the fragment tree
 
     var tw = createWalker(content);
@@ -1106,11 +1108,11 @@ self.kaboobie = (function (exports) {
           });
           node.removeAttribute(search);
           search = "".concat(prefix).concat(++i);
-        } // if the node was a style or a textarea one, check its content
+        } // if the node was a style, textarea, or others, check its content
         // and if it is <!--isµX--> then update tex-only this node
 
 
-        if (/^(?:style|textarea)$/i.test(node.tagName) && node.textContent.trim() === "<!--".concat(search, "-->")) {
+        if (textOnly.test(node.tagName) && node.textContent.trim() === "<!--".concat(search, "-->")) {
           node.textContent = '';
           nodes.push({
             type: 'text',
