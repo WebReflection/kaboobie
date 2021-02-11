@@ -13,6 +13,7 @@ export default {
   context: 'null',
   moduleContext: 'null',
   output: {
+    esModule: false,
     exports: 'named',
     file: './index.js',
     format: 'iife',
