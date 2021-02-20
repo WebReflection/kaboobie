@@ -942,7 +942,7 @@ self.kaboobie = (function (exports) {
           if (oldValue !== newValue) {
             oldValue = newValue;
             if (!text) text = document.createTextNode('');
-            text.nodeValue = newValue;
+            text.data = newValue;
             nodes = diff(comment, nodes, [text]);
           }
 
@@ -1115,7 +1115,7 @@ self.kaboobie = (function (exports) {
       if (node.nodeType === 8) {
         // The only comments to be considered are those
         // which content is exactly the same as the searched one.
-        if (node.nodeValue === search) {
+        if (node.data === search) {
           nodes.push({
             type: 'node',
             path: createPath(node)
