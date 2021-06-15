@@ -3,6 +3,12 @@
 <sup>**Social Media Photo by [Mariam Soliman](https://unsplash.com/@mariamsoliman) on [Unsplash](https://unsplash.com/)**</sup>
 
 
+## Abandoned
+
+Beside the fact I've managed to [bring JSX to µland](https://webreflection.medium.com/bringing-jsx-to-template-literals-1fdfd0901540), something [you can play with online](https://codepen.io/WebReflection/pen/bGqxYpZ?editors=0010), this project cannot compete with more recent alternatives such as [µbe](https://github.com/WebReflection/ube#readme) and [µbe-ssr](https://github.com/WebReflection/ube-ssr#readme).
+
+- - -
+
 A **[<em>µ</em>land](https://github.com/WebReflection/uland#readme)** based **experiment**.
 
 
